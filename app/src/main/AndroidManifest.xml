@@ -9,21 +9,18 @@
         android:roundIcon="@drawable/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".demo"></activity>
-        <activity android:name=".view.AddAmount" />
+        <activity android:name="com.asha.expensetracker.view.AddAmount" />
+
         <activity
-            android:name=".view.SplashActivity"
+            android:name="com.asha.expensetracker.view.SplashActivity"
             android:theme="@style/SplashTheme">
-
-        </activity>
-        <activity android:name=".view.MainActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.asha.expensetracker.view.MainActivity" />
     </application>
 
 </manifest>
