@@ -16,9 +16,9 @@
         app:cardCornerRadius="10dp">
 
         <LinearLayout
-            android:layout_margin="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:orientation="vertical">
 
             <EditText
@@ -33,7 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Write some note" />
-
 
 
             <LinearLayout
@@ -100,8 +99,7 @@
                     android:id="@+id/choose_Date_addnote"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/datepick"
-                     />
+                    android:background="@drawable/datepick" />
 
                 <TextView
                     android:id="@+id/display_date_addnote"
@@ -140,6 +138,22 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <com.google.android.material.card.MaterialCardView
+
+        android:id="@+id/cardview2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cardview1"
+        android:layout_margin="20dp"
+        app:cardCornerRadius="10dp">
+
+        <fragment
+            android:id="@+id/fragment1"
+            android:name="com.asha.expensetracker.view.UtilityActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 
 </RelativeLayout>
