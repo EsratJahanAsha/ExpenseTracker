@@ -10,7 +10,6 @@ import com.asha.expensetracker.model.MyEntity;
 
 import java.util.List;
 
-
 @Dao
 public interface MyDao {
 
