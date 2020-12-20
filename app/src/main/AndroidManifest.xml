@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.asha.expensetracker.view.AddAmount" />
+        <activity android:name="com.asha.expensetracker.view.UpdateAmount" />
 
         <activity
             android:name="com.asha.expensetracker.view.SplashActivity"

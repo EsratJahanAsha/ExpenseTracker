@@ -16,9 +16,9 @@
         app:cardCornerRadius="10dp">
 
         <LinearLayout
+            android:layout_margin="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
             android:orientation="vertical">
 
             <EditText
@@ -33,7 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Write some note" />
-
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -99,7 +98,8 @@
                     android:id="@+id/choose_Date_addnote"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/datepick" />
+                    android:background="@drawable/datepick"
+                    android:onClick="date_picker" />
 
                 <TextView
                     android:id="@+id/display_date_addnote"
@@ -122,6 +122,8 @@
                     android:id="@+id/reset_btn"
                     android:layout_width="40dp"
                     android:layout_height="50dp"
+
+                    android:onClick="resetOnClick"
                     android:src="@drawable/reset_icon"
                     android:text="Reset" />
 
@@ -131,6 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/reset_btn"
                     android:background="@drawable/button_rounded"
+                    android:onClick="add_note_submit"
                     android:text="Add Amount"
                     android:textAllCaps="false" />
 

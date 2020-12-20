@@ -1,12 +1,12 @@
 package com.asha.expensetracker.view;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -23,17 +23,15 @@ import com.asha.expensetracker.model.MyEntity;
 
 import java.util.Calendar;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-
-
-public class AddAmount extends AppCompatActivity {
+public class UpdateAmount extends AppCompatActivity {
     DatePickerDialog picker;
     EditText amount, note;
     TextView date;
     RadioGroup amount_type;
+    RadioButton income_rb, expense_rb;
     Spinner category_spinner;
-    ImageView reset_btn;
+    ArrayAdapter<String> dataAdapter;
+    int myRowId;
     //Room db
     static MyDatabase myDatabase;
     String amount_str, note_str, amount_type_str, category_spinner_str, date_str;
@@ -41,28 +39,50 @@ public class AddAmount extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_amount);
-
+        setContentView(R.layout.activity_update_amount);
         init_view();
         room_db_init(); // initialize room database
         add_item_to_spinner();
-
+        myRowId = getIntentData();
     }
+
 
     //---------------------------------------------------------------------------------------------
     public void init_view() {
-        amount = findViewById(R.id.amount_addnote);
-        category_spinner = findViewById(R.id.category_addnote);
-        date = findViewById(R.id.display_date_addnote);
-        amount_type = findViewById(R.id.amount_type_addnote);
-        note = findViewById(R.id.note_addnote);
-        reset_btn = findViewById(R.id.reset_btn);
+        amount = findViewById(R.id.amount_updatenote);
+        category_spinner = findViewById(R.id.category_updatenote);
+        date = findViewById(R.id.display_date_updatenote);
+        amount_type = findViewById(R.id.amount_type_updatenote);
+        note = findViewById(R.id.note_updatenote);
+        income_rb = findViewById(R.id.income_rb_updatenote);
+        expense_rb = findViewById(R.id.expense_rb_updatenote);
     }
 
     private void room_db_init() {
         myDatabase = Room.databaseBuilder(this, MyDatabase.class, "budget_db")
                 .allowMainThreadQueries()
                 .build();
+    }
+
+    public int getIntentData() {
+        Intent intent = getIntent();
+        int row_id = intent.getIntExtra("id", 0);
+        setFieldValues(row_id);
+        return row_id;
+    }
+
+    public void setFieldValues(int id) {
+        MyEntity row = myDatabase.myDao().getBudgetRow(id);
+        amount.setText(String.valueOf(row.getAmount()));
+        date.setText(row.getDate_note());
+        note.setText(row.getWritten_note());
+
+        if (row.getAmount_type().equals("Income"))
+            income_rb.setChecked(true);
+        else if (row.getAmount_type().equals("Expense"))
+            expense_rb.setChecked(true);
+
+        category_spinner.setSelection(dataAdapter.getPosition(row.getExpense_type()));
     }
 
     //-------------------db task---------------------------------------------------
@@ -87,51 +107,47 @@ public class AddAmount extends AppCompatActivity {
             amount.requestFocus();
             return false;
         } else if (note_str.isEmpty()) {
-            note.setError("Write Some Notes");
+            note.setError("Write Some Amount");
             note.requestFocus();
             return false;
         } else if (amount_type.getCheckedRadioButtonId() == -1) {
             Toast.makeText(this, "Please select amount Type", Toast.LENGTH_SHORT).show();
             return false;
         } else if (category_spinner_str.equals("Choose")) {
-            Toast.makeText(this, "Please choose category", Toast.LENGTH_SHORT).show();
-            return false;
-        } else if (date_str.equals("Date")) {
-            Toast.makeText(this, "Please choose Date", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please choose expense type", Toast.LENGTH_SHORT).show();
             return false;
         } else return true;
     }
 
-
-    public void add_note_submit(View view) {
+    public void update_note_submit(View view) {
         boolean isValidated = field_validation();
         if (isValidated) {
             getRadioFields();
-            MyEntity insert_row = new MyEntity();
-            insert_row.setAmount(Integer.parseInt(amount_str));
-            insert_row.setAmount_type(amount_type_str);
-            insert_row.setWritten_note(note_str);
-            insert_row.setExpense_type(category_spinner_str);
-            insert_row.setDate_note(date_str);
-
-            long isInserted = myDatabase.myDao().addBudget(insert_row);
-
-            if (isInserted > 0) {
-                Toast.makeText(this, "Note Added !!", Toast.LENGTH_SHORT).show();
-                resetFields();
+            MyEntity row = myDatabase.myDao().getBudgetRow(myRowId);
+            if (row != null) {
+                row.setAmount(Integer.parseInt(amount_str));
+                row.setAmount_type(amount_type_str);
+                row.setExpense_type(category_spinner_str);
+                row.setDate_note(date_str);
+                row.setWritten_note(note_str);
+                long t = myDatabase.myDao().updateBudget(row);
+                if (t > 0)
+                    Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(this, "Update failed", Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(this, "add operation Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No records", Toast.LENGTH_SHORT).show();
         }
 
     }
 
+
     //--------------------------------------------------------------------------------------
     public void add_item_to_spinner() {
 
-        String arr[] = {"Choose", "Loan", "Bill", "Home", "Salary", "Rent", "Entertainment",
-                "Bus/Taxi", "Grocery", "Medical/ Insurance", "Education Fee", "Kitchen", "Furniture"};
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+        String arr[]= {"Choose","Loan","Bill","Home","Salary","Rent","Entertainment",
+                "Bus/Taxi","Grocery","Medical/ Insurance","Education Fee","Kitchen","Furniture"};
+        dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, arr);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         category_spinner.setAdapter(dataAdapter);
@@ -156,47 +172,4 @@ public class AddAmount extends AppCompatActivity {
         picker.show();
     }
 
-    public void resetOnClick(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                resetFields();
-                Toast.makeText(AddAmount.this, "Reset Success!!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-
-        builder.setTitle("Reset")
-                .setMessage("Are you sure to Reset Fields?")
-                .setCancelable(true)
-                .create()
-                .show();
-    }
-
-
-    private void resetFields() {
-        amount_type.clearCheck();
-        amount.setText("");
-        note.setText("");
-        category_spinner.setSelection(0);
-        date.setText("Date");
-    }
-
-    public static Boolean checkAmountNegative(int number) {
-        if (number < 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 }
-
